@@ -17,6 +17,10 @@ edits = [
         'hero.addView(button("Switch village \u00b7 "+Ledger.all(this).size()+" saved",this::accounts),lp(-1,40));content.addView(hero);',
         'hero.addView(button("Switch village \\u00b7 "+Ledger.all(this).size()+" saved",this::accounts),lp(-1,40));space(hero,6);hero.addView(button("Ranked & war attacks \\u00b7 API key",()->startActivity(new android.content.Intent(this,ApiSettingsActivity.class))),lp(-1,40));content.addView(hero);',
     ),
+    (
+        'new android.content.Intent(this,ApiSettingsActivity.class))),lp(-1,40));content.addView(hero);',
+        'new android.content.Intent(this,ApiSettingsActivity.class))),lp(-1,40));space(hero,6);hero.addView(button("Backup & restore",()->startActivity(new android.content.Intent(this,BackupActivity.class))),lp(-1,40));content.addView(hero);',
+    ),
 ]
 
 changed = False
