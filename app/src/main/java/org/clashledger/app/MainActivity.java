@@ -197,7 +197,7 @@ public final class MainActivity extends Activity {
         Button importer=primary("Import village JSON",this::importJson); importer.setCompoundDrawablePadding(dp(8));
         android.graphics.drawable.Drawable download=getDrawable(R.drawable.ic_import); download.setTint(0xFF49351A); download.setBounds(0,0,dp(18),dp(18)); importer.setCompoundDrawables(download,null,null,null);
         hero.addView(importer,lp(-1,42));space(hero,6);
-        hero.addView(button("Switch village \u00b7 "+Ledger.all(this).size()+" saved",this::accounts),lp(-1,40));space(hero,6);hero.addView(button("Ranked & war attacks \u00b7 API key",()->startActivity(new android.content.Intent(this,ApiSettingsActivity.class))),lp(-1,40));content.addView(hero);
+        hero.addView(button("Switch village \u00b7 "+Ledger.all(this).size()+" saved",this::accounts),lp(-1,40));space(hero,6);hero.addView(button("Ranked & war attacks \u00b7 API key",()->startActivity(new android.content.Intent(this,ApiSettingsActivity.class))),lp(-1,40));space(hero,6);hero.addView(button("Backup & restore",()->startActivity(new android.content.Intent(this,BackupActivity.class))),lp(-1,40));content.addView(hero);
         space(content,12);
 
         LinearLayout metrics=horizontal();
