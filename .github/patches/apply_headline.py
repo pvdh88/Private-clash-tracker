@@ -13,6 +13,10 @@ edits = [
         'TextView player=text(ledger.village,12,0xFFCDD6DC,true);',
         'TextView player=text((ledger.townHall>0?"Town Hall "+ledger.townHall+" \u00b7 ":"")+ledger.playerTag,12,0xFFCDD6DC,true);',
     ),
+    (
+        'hero.addView(button("Switch village \u00b7 "+Ledger.all(this).size()+" saved",this::accounts),lp(-1,40));content.addView(hero);',
+        'hero.addView(button("Switch village \\u00b7 "+Ledger.all(this).size()+" saved",this::accounts),lp(-1,40));space(hero,6);hero.addView(button("Ranked & war attacks \\u00b7 API key",()->startActivity(new android.content.Intent(this,ApiSettingsActivity.class))),lp(-1,40));content.addView(hero);',
+    ),
 ]
 
 changed = False

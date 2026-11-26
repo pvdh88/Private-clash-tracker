@@ -11,4 +11,7 @@
     <TextView android:id="@+id/cb_attacks_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="ATTACKS LEFT" android:textSize="12sp" android:textStyle="bold" android:fontFamily="sans-serif-condensed" android:textColor="#F2C46C" android:paddingTop="10dp" android:paddingBottom="4dp" android:maxLines="1"/>
     <LinearLayout android:id="@+id/cb_attacks" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical"/>
     <TextView android:id="@+id/cb_note" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="12sp" android:textColor="#A4B0C1" android:padding="8dp" android:visibility="gone"/>
+    <TextView android:id="@+id/cb_war_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="WAR ATTACKS LEFT" android:textSize="12sp" android:textStyle="bold" android:fontFamily="sans-serif-condensed" android:textColor="#F2C46C" android:paddingTop="10dp" android:paddingBottom="4dp" android:maxLines="1"/>
+    <LinearLayout android:id="@+id/cb_war" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical"/>
+    <TextView android:id="@+id/cb_war_note" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="12sp" android:textColor="#A4B0C1" android:padding="8dp" android:visibility="gone"/>
 </LinearLayout>

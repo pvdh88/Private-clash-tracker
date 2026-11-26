@@ -16,10 +16,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/** One widget with the next five upgrades across all villages and the villages that still have ranked attacks left. */
+/** One widget with the next five upgrades, villages with ranked attacks left, and villages with clan war attacks left. */
 public final class CombinedWidget extends AppWidgetProvider {
     static final String REFRESH="org.clashledger.REFRESH_COMBINED";
-    private static final int UPGRADE_ROWS=5, ATTACK_ROWS=6;
+    private static final int UPGRADE_ROWS=5, ATTACK_ROWS=6, WAR_ROWS=6;
     private static final class Entry {
         final Ledger ledger;final Upgrade upgrade;final long left;
         Entry(Ledger ledger,Upgrade upgrade,long left) { this.ledger=ledger;this.upgrade=upgrade;this.left=left; }
@@ -118,6 +118,28 @@ public final class CombinedWidget extends AppWidgetProvider {
         root.setTextViewText(R.id.cb_note,note);
         root.setViewVisibility(R.id.cb_note,note.isEmpty()?View.GONE:View.VISIBLE);
         root.setTextViewText(R.id.cb_attacks_title,"ATTACKS LEFT"+(settings.configured()&&pending>0?" \u00b7 "+pending:""));
+
+        root.removeAllViews(R.id.cb_war);
+        if(settings.configured()) {
+            List<RankedTracker.War> wars=RankedTracker.warLines(c);
+            for(int n=0;n<Math.min(WAR_ROWS,wars.size());n++) {
+                RankedTracker.War war=wars.get(n);
+                RemoteViews row=new RemoteViews(c.getPackageName(),R.layout.widget_ranked_row);
+                if(oled)row.setInt(R.id.rk_row,"setBackgroundResource",R.drawable.oled_tile);
+                row.setTextViewText(R.id.rk_name,war.village);
+                row.setTextViewText(R.id.rk_status,war.left+"/"+war.per+" left");
+                row.setTextColor(R.id.rk_status,0xFFF2C46C);
+                row.setTextViewText(R.id.rk_detail,war.end>0?"War ends in "+TimerFormat.format(Math.max(0,war.end-now),"compact"):"Clan war");
+                root.addView(R.id.cb_war,row);
+            }
+            root.setTextViewText(R.id.cb_war_title,"WAR ATTACKS LEFT"+(wars.isEmpty()?"":" \u00b7 "+wars.size()));
+            root.setTextViewText(R.id.cb_war_note,wars.size()>WAR_ROWS?"+"+(wars.size()-WAR_ROWS)+" more villages":wars.isEmpty()?"No clan war attacks to make":"");
+            root.setViewVisibility(R.id.cb_war_note,wars.size()>WAR_ROWS||wars.isEmpty()?View.VISIBLE:View.GONE);
+            root.setViewVisibility(R.id.cb_war_title,View.VISIBLE);
+        } else {
+            root.setViewVisibility(R.id.cb_war_title,View.GONE);
+            root.setViewVisibility(R.id.cb_war_note,View.GONE);
+        }
         root.setTextViewText(R.id.cb_meta,all.size()+" RUNNING \u00b7 "+Ledger.all(c).size()+" VILLAGES \u00b7 "+DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date(now)));
         manager.updateAppWidget(id,root);
     }
