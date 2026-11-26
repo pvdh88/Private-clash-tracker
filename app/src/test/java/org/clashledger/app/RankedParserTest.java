@@ -26,6 +26,15 @@ public class RankedParserTest {
         assertTrue(s.hasTimes);
         assertEquals(1,s.done());
     }
+    @Test public void readsTheBattleTimestampField() throws Exception {
+        String body="{\"items\":["
+            +"{\"battleType\":\"ranked\",\"attack\":true,\"battleTime\":139,\"battleTimestamp\":\"20261126T060554.000Z\"},"
+            +"{\"battleType\":\"ranked\",\"attack\":true,\"battleTime\":137,\"battleTimestamp\":\"20261124T100851.000Z\"}]}";
+        RankedParser.Summary s=RankedParser.parse(body,utc(2026,11,26,14),false);
+        assertTrue(s.hasTimes);
+        assertEquals(2,s.rankedAttacks);
+        assertEquals(1,s.done());
+    }
     @Test public void undatedLogCountsEveryRankedAttack() throws Exception {
         String body="{\"items\":[{\"battleType\":\"ranked\",\"attack\":true},{\"battleType\":\"legend\",\"attack\":true}]}";
         RankedParser.Summary s=RankedParser.parse(body,utc(2026,11,26,14),false);

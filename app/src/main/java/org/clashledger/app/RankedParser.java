@@ -28,10 +28,15 @@ public final class RankedParser {
             JSONObject o=items.optJSONObject(i);
             if(o==null||!o.optBoolean("attack",false)||!isRanked(o.optString("battleType","")))continue;
             ranked++;
-            long at=parseTime(o.optString("battleTime",""));
+            long at=parseTime(stamp(o));
             if(at>=0) { times=true;if(at>=start&&at<=now+60000)inWindow++; }
         }
         return new Summary(ranked,inWindow,times);
+    }
+    /** The API dates battles with battleTimestamp. battleTime is a number and is only a fallback. */
+    static String stamp(JSONObject o) {
+        String s=o.optString("battleTimestamp","");
+        return s.isEmpty()?o.optString("battleTime",""):s;
     }
     static boolean isRanked(String type) {
         String t=type.toLowerCase(Locale.ROOT);
