@@ -3,7 +3,7 @@ on:
   push:
   pull_request:
 permissions:
-  contents: read
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,6 +27,17 @@ jobs:
             echo "Using the saved signing key"
           else
             echo "No DEBUG_KEYSTORE_BASE64 secret, a new random debug key will be used"
+          fi
+      - name: Apply home screen headline patch
+        run: python3 .github/patches/apply_headline.py
+      - name: Commit the patch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          if ! git diff --quiet; then
+            git config user.name "github-actions"
+            git config user.email "github-actions@users.noreply.github.com"
+            git commit -am "Home screen: show the village name as the headline"
+            git push || echo "Push skipped"
           fi
       - uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
