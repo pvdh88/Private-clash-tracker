@@ -52,3 +52,28 @@ jobs:
           path: |
             app/build/reports/tests/
             app/build/reports/lint-results-debug.*
+      - name: Publish the latest release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk clash-ledger.apk
+          cat > release-notes.md <<'EOF'
+          # Clash Ledger
+
+          A free, unofficial companion app for Clash of Clans: upgrade timers across all your villages, home screen widgets, and ranked attack tracking.
+
+          ## Install
+          1. Download clash-ledger.apk below on your Android phone.
+          2. Open it and allow installs from your browser or file manager if asked.
+          3. Later builds install over the top as long as they use the same signing key.
+
+          ## Privacy
+          All data stays on your device. The optional ranked attack feature sends only your player tags to the Clash of Clans API (or the proxy you choose) using your own API token.
+
+          ## Disclaimer
+          This is unofficial fan content and is not affiliated with or endorsed by Supercell. Clash of Clans and related artwork are the property of Supercell. Released under the MIT License.
+          EOF
+          sed -i 's/^          //' release-notes.md
+          gh release delete latest --cleanup-tag -y || true
+          gh release create latest clash-ledger.apk --title "Clash Ledger (latest build)" --notes-file release-notes.md --target "$GITHUB_SHA"
