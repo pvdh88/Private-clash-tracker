@@ -1,0 +1,8 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/next_row" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:padding="6dp" android:layout_marginBottom="4dp" android:background="@drawable/widget_row_bg">
+    <ImageView android:id="@+id/next_art" android:layout_width="32dp" android:layout_height="36dp" android:scaleType="fitCenter" android:importantForAccessibility="no"/>
+    <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:paddingStart="8dp">
+        <TextView android:id="@+id/next_name" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="12sp" android:textStyle="bold" android:textColor="#F2F5F7" android:maxLines="1" android:ellipsize="end"/>
+        <TextView android:id="@+id/next_sub" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="10sp" android:textColor="#A4B0C1" android:maxLines="1" android:ellipsize="end" android:paddingTop="2dp"/>
+    </LinearLayout>
+    <Chronometer android:id="@+id/next_clock" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold" android:textColor="#A6DD98" android:paddingStart="6dp"/>
+</LinearLayout>

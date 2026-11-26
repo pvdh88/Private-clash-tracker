@@ -1,0 +1,4 @@
+<resources>
+    <string name="widget_all_description">Next five upgrades to finish across all saved villages.</string>
+    <string name="widget_ranked_description">Which saved villages still have ranked attacks to complete.</string>
+</resources>
