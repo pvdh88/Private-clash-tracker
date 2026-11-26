@@ -187,8 +187,8 @@ public final class MainActivity extends Activity {
         hero.setBackground(panel(0xFF293649,0xFF182B2B,0xFF40534E,22));
         LinearLayout heroTop=horizontal(); LinearLayout heroCopy=column();
         heroCopy.addView(label("HOME VILLAGE",gold)); space(heroCopy,7);
-        TextView village=title(ledger.townHall>0 ? "Town Hall "+ledger.townHall : "Your village",29); heroCopy.addView(village);
-        space(heroCopy,5); TextView player=text(ledger.village,12,0xFFCDD6DC,true); player.setMaxLines(1); player.setEllipsize(android.text.TextUtils.TruncateAt.END); heroCopy.addView(player);
+        TextView village=title(ledger.village.isEmpty()||ledger.village.startsWith("#")?(ledger.townHall>0?"Town Hall "+ledger.townHall:"Your village"):ledger.village,29); heroCopy.addView(village);
+        space(heroCopy,5); TextView player=text((ledger.townHall>0?"Town Hall "+ledger.townHall+" · ":"")+ledger.playerTag,12,0xFFCDD6DC,true); player.setMaxLines(1); player.setEllipsize(android.text.TextUtils.TruncateAt.END); heroCopy.addView(player);
         player.setContentDescription("Switch village: "+ledger.village);player.setOnClickListener(v->accounts());
         space(heroCopy,10); TextView local=text(ledger.importedAt>0 ? "Export · " + DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT).format(new Date(ledger.importedAt)) : "Import your village to get started",10,0xFF9DAFB8,false); heroCopy.addView(local);
         heroTop.addView(heroCopy,new LinearLayout.LayoutParams(0,-2,1));
