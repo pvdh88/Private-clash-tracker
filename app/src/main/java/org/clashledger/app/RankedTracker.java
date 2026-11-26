@@ -18,7 +18,7 @@ import java.util.Set;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/** Fetches each saved village's battle log from the Clash of Clans API and reports ranked attack status. */
+/** Fetches each saved village's battle log and league from the Clash of Clans API and reports ranked attack status. */
 public final class RankedTracker {
     public static final int PENDING=0, UNKNOWN=1, DONE=2;
     private static final long MIN_INTERVAL=10*60*1000L;
@@ -38,10 +38,15 @@ public final class RankedTracker {
         if(saved==null)return null;
         try { return new JSONObject(saved); } catch(JSONException e) { return null; }
     }
-    private static void save(Context c,String tag,int done,int ranked,boolean times,String error) {
+    private static void saveError(Context c,String tag,String error) {
+        JSONObject o=load(c,tag);
+        if(o==null)o=new JSONObject();
+        try { prefs(c).edit().putString(tag,o.put("error",error).put("at",System.currentTimeMillis()).toString()).apply(); } catch(JSONException ignored) { }
+    }
+    private static void save(Context c,String tag,int done,int ranked,boolean times,int target,boolean weekly,String league) {
         try {
-            prefs(c).edit().putString(tag,new JSONObject().put("done",done).put("ranked",ranked).put("times",times)
-                .put("at",System.currentTimeMillis()).put("error",error).toString()).apply();
+            prefs(c).edit().putString(tag,new JSONObject().put("done",done).put("ranked",ranked).put("times",times).put("at",System.currentTimeMillis())
+                .put("error","").put("target",target).put("weekly",weekly).put("league",league).toString()).apply();
         } catch(JSONException ignored) { }
     }
     public static List<Line> lines(Context c) {
@@ -58,11 +63,14 @@ public final class RankedTracker {
             String error=o.optString("error","");
             if(!error.isEmpty()) { out.add(new Line(l.village,"Error",error+" · "+when,UNKNOWN));continue; }
             boolean times=o.optBoolean("times");
+            boolean weekly=o.has("weekly")?o.optBoolean("weekly"):s.weekly();
+            int target=o.has("target")?o.optInt("target"):s.target();
             if(!times) { out.add(new Line(l.village,o.optInt("ranked")+" in log","Battle log has no dates, so today's count is unknown · "+when,UNKNOWN));continue; }
-            if(o.optLong("at")<RankedParser.windowStart(now,s.weekly())) { out.add(new Line(l.village,"Refresh","Last fetched before the latest reset · "+when,UNKNOWN));continue; }
-            int done=o.optInt("done"),target=s.target();
+            if(o.optLong("at")<RankedParser.windowStart(now,weekly)) { out.add(new Line(l.village,"Refresh","Last fetched before the latest reset · "+when,UNKNOWN));continue; }
+            int done=o.optInt("done");
             boolean complete=done>=target;
-            out.add(new Line(l.village,done+"/"+target+(complete?" ✓":""),(s.weekly()?"This week":"Today")+" · "+when,complete?DONE:PENDING));
+            String league=o.optString("league","");
+            out.add(new Line(l.village,done+"/"+target+(complete?" ✓":""),(league.isEmpty()?"":league+" · ")+(weekly?"This week":"Today")+" · "+when,complete?DONE:PENDING));
         }
         return out;
     }
@@ -89,29 +97,45 @@ public final class RankedTracker {
     /** Returns an empty string on success, otherwise a short error. */
     public static String fetchOne(Context c,String tag) {
         RankedSettings s=new RankedSettings(c);
-        HttpURLConnection conn=null;
         String error;
         try {
-            conn=(HttpURLConnection)new URL(s.baseUrl()+"/players/"+URLEncoder.encode(tag,"UTF-8")+"/battlelog").openConnection();
+            String encoded=URLEncoder.encode(tag,"UTF-8");
+            String body=get(s,"/players/"+encoded+"/battlelog");
+            prefs(c).edit().putString("lastRaw",body.length()>60000?body.substring(0,60000):body).apply();
+            RankedLeague.Rule rule=null;
+            if(s.autoLeague()) {
+                try {
+                    String player=get(s,"/players/"+encoded);
+                    JSONObject profile=new JSONObject(player);
+                    JSONObject tier=profile.optJSONObject("leagueTier");
+                    prefs(c).edit().putString("lastLeague",tier==null?"no leagueTier field":tier.toString()).apply();
+                    rule=RankedLeague.fromPlayer(profile);
+                } catch(Exception ignored) { }
+            }
+            boolean weekly=rule!=null?rule.weekly:s.weekly();
+            int target=rule!=null?rule.attacks:s.target();
+            RankedParser.Summary sum=RankedParser.parse(body,System.currentTimeMillis(),weekly);
+            save(c,tag,sum.done(),sum.rankedAttacks,sum.hasTimes,target,weekly,rule!=null?rule.label:"");
+            return "";
+        } catch(JSONException e) { error="Unexpected response from the API";
+        } catch(Exception e) { error=e.getMessage()==null?"Request failed":e.getMessage(); }
+        saveError(c,tag,error);
+        return error;
+    }
+    private static String get(RankedSettings s,String path) throws java.io.IOException {
+        HttpURLConnection conn=null;
+        try {
+            conn=(HttpURLConnection)new URL(s.baseUrl()+path).openConnection();
             conn.setConnectTimeout(10000);conn.setReadTimeout(15000);conn.setInstanceFollowRedirects(false);
             conn.setRequestProperty("Authorization","Bearer "+s.token());
             conn.setRequestProperty("Accept","application/json");conn.setRequestProperty("User-Agent","Clash-Ledger");
             int status=conn.getResponseCode();
-            if(status==200) {
-                String body=read(conn.getInputStream());
-                prefs(c).edit().putString("lastRaw",body.length()>60000?body.substring(0,60000):body).apply();
-                RankedParser.Summary sum=RankedParser.parse(body,System.currentTimeMillis(),s.weekly());
-                save(c,tag,sum.done(),sum.rankedAttacks,sum.hasTimes,"");
-                return "";
-            }
-            error=describe(status);
-        } catch(JSONException e) { error="Unexpected response from the API";
-        } catch(Exception e) { error=e.getMessage()==null?"Request failed":e.getMessage();
+            if(status!=200)throw new java.io.IOException(describe(status));
+            return read(conn.getInputStream());
         } finally { if(conn!=null)conn.disconnect(); }
-        save(c,tag,0,0,false,error);
-        return error;
     }
     public static String lastRaw(Context c) { return prefs(c).getString("lastRaw",""); }
+    public static String lastLeague(Context c) { return prefs(c).getString("lastLeague",""); }
     private static String describe(int status) {
         if(status==400)return "Bad player tag";
         if(status==403)return "API key rejected. Check the key and its allowed IP address";

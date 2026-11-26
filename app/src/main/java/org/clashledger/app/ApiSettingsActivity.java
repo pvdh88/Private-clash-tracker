@@ -19,7 +19,7 @@ import android.widget.Toast;
 /** Links the Clash of Clans API for ranked-attack tracking. Opened from the ranked widget's gear button. */
 public final class ApiSettingsActivity extends Activity {
     private EditText token,base,target;
-    private CheckBox weekly;
+    private CheckBox weekly,auto;
     private TextView status;
     private float dp;
     @Override protected void onCreate(Bundle b) {
@@ -40,16 +40,21 @@ public final class ApiSettingsActivity extends Activity {
         base=field("Base URL (blank = official server)",s.baseUrl().equals(RankedSettings.DEFAULT_BASE)?"":s.baseUrl());
         base.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_URI);
         add(root,base,8);
-        target=field("Ranked attacks per window (8 for daily Legend)",String.valueOf(s.target()));
+        auto=new CheckBox(this);
+        auto.setText("Detect each village's league automatically (attack count and daily or weekly)");
+        auto.setTextColor(0xFFF2F5F7);auto.setChecked(s.autoLeague());
+        add(root,auto,12);
+        add(root,label("The values below are used when the league can't be detected.",12,0xFFA4B0C1,false),4);
+        target=field("Fallback ranked attacks per window (8 for daily Legend I)",String.valueOf(s.target()));
         target.setInputType(InputType.TYPE_CLASS_NUMBER);
         add(root,target,8);
         weekly=new CheckBox(this);
-        weekly.setText("Count per week (Monday 05:00 UTC) instead of per day (05:00 UTC)");
+        weekly.setText("Fallback: count per week (Monday 05:00 UTC) instead of per day (05:00 UTC)");
         weekly.setTextColor(0xFFF2F5F7);weekly.setChecked(s.weekly());
         add(root,weekly,8);
         add(root,button("Save and fetch now",()->{ if(save())fetchNow(); }),12);
         add(root,button("Save only",()->{ if(save()) { Toast.makeText(this,"Saved",Toast.LENGTH_SHORT).show();RankedWidget.refresh(this);showStatus(); } }),6);
-        add(root,button("Copy last battle log response",this::copyRaw),6);
+        add(root,button("Copy last battle log and league",this::copyRaw),6);
         status=label("",13,0xFFF2F5F7,false);
         add(root,status,16);
         setContentView(scroll);
@@ -83,7 +88,7 @@ public final class ApiSettingsActivity extends Activity {
         t=Math.max(1,Math.min(99,t));
         String url=base.getText().toString().trim();
         if(!url.isEmpty()&&!url.startsWith("https://")) { Toast.makeText(this,"Base URL must start with https://",Toast.LENGTH_LONG).show();return false; }
-        new RankedSettings(this).save(token.getText().toString().trim(),url.isEmpty()?RankedSettings.DEFAULT_BASE:url,t,weekly.isChecked());
+        new RankedSettings(this).save(token.getText().toString().trim(),url.isEmpty()?RankedSettings.DEFAULT_BASE:url,t,weekly.isChecked(),auto.isChecked());
         return true;
     }
     private void fetchNow() {
@@ -103,7 +108,8 @@ public final class ApiSettingsActivity extends Activity {
     private void copyRaw() {
         String raw=RankedTracker.lastRaw(this);
         if(raw.isEmpty()) { Toast.makeText(this,"Nothing fetched yet",Toast.LENGTH_SHORT).show();return; }
-        ((ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Clash battle log",raw));
+        String text="leagueTier: "+RankedTracker.lastLeague(this)+"\n\n"+raw;
+        ((ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Clash battle log",text));
         Toast.makeText(this,"Copied. It includes opponent player tags.",Toast.LENGTH_LONG).show();
     }
 }

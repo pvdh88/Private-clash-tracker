@@ -16,8 +16,10 @@ public final class RankedSettings {
     }
     public int target() { return Math.max(1,prefs.getInt("target",8)); }
     public boolean weekly() { return prefs.getBoolean("weekly",false); }
+    /** When on, each village's league sets its attack count and daily or weekly window. */
+    public boolean autoLeague() { return prefs.getBoolean("auto",true); }
     public boolean configured() { return !token().isEmpty(); }
-    public void save(String token,String baseUrl,int target,boolean weekly) {
-        prefs.edit().putString("token",token).putString("baseUrl",baseUrl).putInt("target",target).putBoolean("weekly",weekly).apply();
+    public void save(String token,String baseUrl,int target,boolean weekly,boolean auto) {
+        prefs.edit().putString("token",token).putString("baseUrl",baseUrl).putInt("target",target).putBoolean("weekly",weekly).putBoolean("auto",auto).apply();
     }
 }
