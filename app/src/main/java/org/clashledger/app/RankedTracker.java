@@ -49,6 +49,17 @@ public final class RankedTracker {
                 .put("error","").put("target",target).put("weekly",weekly).put("league",league).toString()).apply();
         } catch(JSONException ignored) { }
     }
+    /** Replaces a placeholder village name (blank, "My village" or the tag itself) with the in-game name. Custom names are left alone. */
+    private static void applyName(Context c,String tag,String name) {
+        if(name==null||name.trim().isEmpty())return;
+        try {
+            for(Ledger l:Ledger.all(c)) {
+                if(!normalizeTag(l.playerTag).equals(tag))continue;
+                String current=l.village==null?"":l.village.trim();
+                if(current.isEmpty()||current.equals("My village")||normalizeTag(current).equals(tag)) { l.village=name.trim();l.save(); }
+            }
+        } catch(RuntimeException ignored) { }
+    }
     public static List<Line> lines(Context c) {
         RankedSettings s=new RankedSettings(c);
         List<Line> out=new ArrayList<>();
@@ -109,6 +120,7 @@ public final class RankedTracker {
                     JSONObject profile=new JSONObject(player);
                     JSONObject tier=profile.optJSONObject("leagueTier");
                     prefs(c).edit().putString("lastLeague",tier==null?"no leagueTier field":tier.toString()).apply();
+                    applyName(c,tag,profile.optString("name",""));
                     rule=RankedLeague.fromPlayer(profile);
                 } catch(Exception ignored) { }
             }
