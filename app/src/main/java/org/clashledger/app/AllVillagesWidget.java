@@ -30,6 +30,7 @@ public final class AllVillagesWidget extends AppWidgetProvider {
         for(int id:ids)render(c,m,id);
         scheduleNext(c,ids.length>0);
         CombinedWidget.refresh(c);
+        WatchSync.push(c);
     }
     @Override public void onUpdate(Context c,AppWidgetManager m,int[] ids) { for(int id:ids)render(c,m,id);scheduleNext(c,ids.length>0); }
     @Override public void onAppWidgetOptionsChanged(Context c,AppWidgetManager m,int id,Bundle b) { render(c,m,id); }

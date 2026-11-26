@@ -7,4 +7,4 @@ android {
     sourceSets { test { resources.srcDir 'src/main/assets' } }
     buildTypes { release { minifyEnabled false } }
 }
-dependencies { testImplementation 'junit:junit:4.13.2'; testImplementation 'org.json:json:20240303' }
+dependencies { implementation 'com.google.android.gms:play-services-wearable:18.2.0'; testImplementation 'junit:junit:4.13.2'; testImplementation 'org.json:json:20240303' }

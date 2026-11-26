@@ -45,6 +45,14 @@ jobs:
         with:
           name: clash-ledger-debug
           path: app/build/outputs/apk/debug/app-debug.apk
+      - name: Build the watch app
+        continue-on-error: true
+        run: ./gradlew :wear:assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clash-ledger-wear-debug
+          path: wear/build/outputs/apk/debug/wear-debug.apk
+          if-no-files-found: ignore
       - uses: actions/upload-artifact@v4
         if: always()
         with:
