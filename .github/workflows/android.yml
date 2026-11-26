@@ -30,13 +30,16 @@ jobs:
           fi
       - name: Apply home screen headline patch
         run: python3 .github/patches/apply_headline.py
+      - name: Dump the settings menu code
+        run: python3 .github/patches/dump_settings.py
       - name: Commit the patch
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          if ! git diff --quiet; then
+          if [ -n "$(git status --porcelain)" ]; then
             git config user.name "github-actions"
             git config user.email "github-actions@users.noreply.github.com"
-            git commit -am "Home screen: show the village name as the headline"
+            git add -A
+            git commit -m "Build: apply home screen patches and settings menu dump"
             git push || echo "Push skipped"
           fi
       - uses: gradle/actions/setup-gradle@v4
