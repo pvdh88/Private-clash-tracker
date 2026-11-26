@@ -29,6 +29,7 @@ public final class AllVillagesWidget extends AppWidgetProvider {
         int[] ids=m.getAppWidgetIds(new ComponentName(c,AllVillagesWidget.class));
         for(int id:ids)render(c,m,id);
         scheduleNext(c,ids.length>0);
+        CombinedWidget.refresh(c);
     }
     @Override public void onUpdate(Context c,AppWidgetManager m,int[] ids) { for(int id:ids)render(c,m,id);scheduleNext(c,ids.length>0); }
     @Override public void onAppWidgetOptionsChanged(Context c,AppWidgetManager m,int id,Bundle b) { render(c,m,id); }
@@ -76,15 +77,15 @@ public final class AllVillagesWidget extends AppWidgetProvider {
             RemoteViews row=new RemoteViews(c.getPackageName(),R.layout.widget_next_row);
             if(oled)row.setInt(R.id.next_row,"setBackgroundResource",R.drawable.oled_tile);
             row.setImageViewResource(R.id.next_art,Artwork.forUpgrade(c,u));
-            row.setTextViewText(R.id.next_name,e.ledger.village+" · "+u.name+(u.goblin?" · G":""));
-            row.setTextViewText(R.id.next_sub,(u.isForge()?"Gold":"→ "+u.level)+" · "+u.group+" · "+DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT).format(new Date(now+e.left)));
+            row.setTextViewText(R.id.next_name,e.ledger.village+" \u00b7 "+u.name+(u.goblin?" \u00b7 G":""));
+            row.setTextViewText(R.id.next_sub,(u.isForge()?"Gold":"\u2192 "+u.level)+" \u00b7 "+u.group+" \u00b7 "+DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT).format(new Date(now+e.left)));
             row.setChronometerCountDown(R.id.next_clock,true);
             row.setChronometer(R.id.next_clock,elapsed+e.left,null,clock);
             if(!clock)row.setTextViewText(R.id.next_clock,TimerFormat.format(e.left,style));
             root.addView(R.id.next_rows,row);
         }
         root.setViewVisibility(R.id.next_empty,all.isEmpty()?View.VISIBLE:View.GONE);
-        root.setTextViewText(R.id.next_meta,"ALL "+Ledger.all(c).size()+" VILLAGES · "+all.size()+" RUNNING · "+DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date(now)));
+        root.setTextViewText(R.id.next_meta,"ALL "+Ledger.all(c).size()+" VILLAGES \u00b7 "+all.size()+" RUNNING \u00b7 "+DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date(now)));
         manager.updateAppWidget(id,root);
     }
 }

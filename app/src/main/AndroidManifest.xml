@@ -32,5 +32,9 @@
             <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/><action android:name="android.intent.action.TIME_SET"/><action android:name="android.intent.action.TIMEZONE_CHANGED"/></intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/ranked_widget"/>
         </receiver>
+        <receiver android:name=".CombinedWidget" android:label="Clash Ledger all-in-one" android:exported="false">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/><action android:name="android.intent.action.TIME_SET"/><action android:name="android.intent.action.TIMEZONE_CHANGED"/><action android:name="org.clashledger.REFRESH_COMBINED"/><action android:name="org.clashledger.TICK_COMBINED"/></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/combined_widget"/>
+        </receiver>
     </application>
 </manifest>

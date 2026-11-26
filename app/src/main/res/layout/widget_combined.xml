@@ -1,0 +1,14 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/widget_root" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@drawable/widget_bg">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:paddingBottom="8dp">
+        <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
+            <TextView android:id="@+id/cb_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="NEXT 5 UPGRADES" android:textSize="16sp" android:textStyle="bold" android:fontFamily="sans-serif-condensed" android:textColor="#F2F5F7" android:maxLines="1"/>
+            <TextView android:id="@+id/cb_meta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="ALL VILLAGES" android:textSize="10sp" android:textColor="#F2C46C" android:paddingTop="3dp" android:maxLines="1" android:ellipsize="end"/>
+        </LinearLayout>
+        <ImageView android:id="@+id/cb_refresh" android:layout_width="44dp" android:layout_height="44dp" android:src="@drawable/ic_refresh" android:padding="12dp" android:background="@drawable/widget_row_bg" android:contentDescription="Refresh widget"/>
+    </LinearLayout>
+    <LinearLayout android:id="@+id/cb_upgrades" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical"/>
+    <TextView android:id="@+id/cb_empty" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="No running upgrades. Import a village to start tracking." android:textSize="12sp" android:textColor="#A4B0C1" android:padding="8dp" android:visibility="gone"/>
+    <TextView android:id="@+id/cb_attacks_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="ATTACKS LEFT" android:textSize="12sp" android:textStyle="bold" android:fontFamily="sans-serif-condensed" android:textColor="#F2C46C" android:paddingTop="10dp" android:paddingBottom="4dp" android:maxLines="1"/>
+    <LinearLayout android:id="@+id/cb_attacks" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical"/>
+    <TextView android:id="@+id/cb_note" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="12sp" android:textColor="#A4B0C1" android:padding="8dp" android:visibility="gone"/>
+</LinearLayout>
